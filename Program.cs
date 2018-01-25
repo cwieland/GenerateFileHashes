@@ -27,22 +27,54 @@ namespace Junkosoft
             FileInfo file = new FileInfo(filename);
             if (file.Exists)
             {
-                FileHashes f = new FileHashes(file.FullName);
-                Console.Write("Calculating MD5...");
-                byte[] md5 = f.MD5;
-                Console.WriteLine();
-
-                Console.Write("Calulating SHA1...");
-                byte[] sha1 = f.SHA1;
-                Console.WriteLine();
-
-                Console.WriteLine();
-                Console.WriteLine(string.Format("MD5:\t{0}", GetByteString(md5)));
-                Console.WriteLine(string.Format("SHA1:\t{0}", GetByteString(sha1)));
+                ProcessFile(file);
             }
             else
             {
-                Console.WriteLine(file + " does not exist.");
+                DirectoryInfo directory = new DirectoryInfo(filename);
+                if (directory.Exists)
+                {
+                    ProcessFolder(directory);
+                }
+                else
+                {
+                    Console.WriteLine(file + " does not exist.");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Processes a file
+        /// </summary>
+        /// <param name="file">File to process</param>
+        private void ProcessFile(FileInfo file)
+        {
+            FileHashes f = new FileHashes(file.FullName);
+            Console.WriteLine(file.FullName);
+            Console.Write("MD5\t");
+            byte[] md5 = f.MD5;
+            Console.WriteLine(GetByteString(md5));
+
+            Console.Write("SHA1\t");
+            byte[] sha1 = f.SHA1;
+            Console.WriteLine(GetByteString(sha1));
+            Console.WriteLine();
+        }
+
+        /// <summary>
+        /// Processes files in a directory and sub-directories
+        /// </summary>
+        /// <param name="directory">Directory to process</param>
+        private void ProcessFolder(DirectoryInfo directory)
+        {
+            foreach (FileInfo file in directory.GetFiles())
+            {
+                ProcessFile(file);
+            }
+
+            foreach (DirectoryInfo subdir in directory.GetDirectories())
+            {
+                ProcessFolder(subdir);
             }
         }
 
